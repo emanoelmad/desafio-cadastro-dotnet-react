@@ -1,5 +1,8 @@
-namespace CadastroPessoasApi.Tests;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Xunit;
 
+namespace CadastroPessoasApi.Tests;
 
 public class PessoasControllerTests : IClassFixture<TestingWebAppFactory<Program>>
 {
@@ -16,7 +19,7 @@ public class PessoasControllerTests : IClassFixture<TestingWebAppFactory<Program
         var novaPessoa = new
         {
             Nome = "Maria da Silva",
-            Cpf = "123.456.789-01",
+            CPF = "529.982.247-25",
             DataNascimento = new DateTime(1990, 5, 15)
         };
 
@@ -25,7 +28,7 @@ public class PessoasControllerTests : IClassFixture<TestingWebAppFactory<Program
             System.Text.Encoding.UTF8,
             "application/json");
 
-        var response = await _client.PostAsync("/Pessoas", jsonContent);
+        var response = await _client.PostAsync("/api/pessoas", jsonContent);
 
         Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
 
