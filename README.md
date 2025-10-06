@@ -11,54 +11,62 @@ Obs: Este projeto foi preparado para um processo seletivo — foram aplicadas bo
 - `src/Backend/CadastroPessoasApi/` - API em .NET (Models, Controllers, Data, Migrations)
 - `src/Backend/CadastroPessoasApi.Tests/` - Projeto de testes xUnit (integração)
 - `src/Frontend/cadastro-ui/` - Frontend React (Vite)
+# Desafio Cadastro — Backend (.NET) + Frontend (React)
 
-## Requisitos
+Este repositório contém uma implementação de referência para um sistema simples de cadastro de pessoas. O objetivo deste README é oferecer instruções claras para desenvolver, testar e publicar a aplicação localmente ou em um ambiente de produção simples.
 
+Conteúdo:
+- Backend: `src/Backend/CadastroPessoasApi/` (ASP.NET Core, EF Core, SQLite)
+- Testes: `src/Backend/CadastroPessoasApi.Tests/` (xUnit, integração)
+- Frontend: `src/Frontend/cadastro-ui/` (React + Vite)
+
+Principais características implementadas
+- Endpoints CRUD para Pessoa (com DTOs)
+- Validações: CPF (algoritmo), email, data de nascimento e campos obrigatórios
+- Armazenamento: SQLite (arquivo local) para desenvolvimento
+- Autenticação: JWT (endpoint de login para obter token)
+- Documentação: Swagger (com configuração para Bearer token)
+- Testes de integração com WebApplicationFactory e SQLite in-memory
+
+Requisitos
 - .NET SDK 8.0+
-- Node.js 18+ (ou LTS atual)
-- npm (ou yarn)
+- Node.js 18+ (ou LTS compatível)
+- npm ou yarn
 
-## Como rodar localmente (backend)
+Configurações recomendadas (variáveis de ambiente)
+- ASPNETCORE_ENVIRONMENT=Development | Production
+- ConnectionStrings: a cadeia de conexão SQLite pode ser configurada em `appsettings.json` ou via variável de ambiente `ConnectionStrings__DefaultConnection`.
+- JwtSettings: `JwtSettings__Key`, `JwtSettings__Issuer`, `JwtSettings__Audience` (para produção, use um segredo forte e seguro).
 
-Abra um PowerShell e execute:
+Rodando o backend (desenvolvimento)
+
+1. Abrir PowerShell na raiz do repositório e executar:
 
 ```powershell
-# Navegar até a pasta do backend
 Push-Location .\src\Backend\CadastroPessoasApi
-
-# Restaurar dependências e compilar
 dotnet restore
 dotnet build
+```
 
-# Aplicar migrations (cria banco sqlite local `cadastro.db`)
-# Se não quiser aplicar, ignore este passo
-dotnet tool restore || $true
-dotnet ef database update || $true
+2. (Opcional) Aplicar migrations para criar/atualizar o banco SQLite local:
 
-# Iniciar a API
+```powershell
+dotnet tool restore; dotnet ef database update
+```
+
+3. Iniciar a API:
+
+```powershell
 dotnet run
-
-# Depois de terminar, volte
-Pop-Location
 ```
 
-A API será exposta em `https://localhost:<porta>` (o console do `dotnet run` mostra a porta). O Swagger estará disponível em `https://localhost:<porta>/swagger`.
+A API será exposta em `https://localhost:<porta>` (o console do `dotnet run` mostra a porta). A documentação interativa do Swagger fica em `/swagger`.
 
-Usuários de teste (para obter JWT via `/api/auth/login`):
-- `admin` / `password123`
-- `user` / `password123`
+Autenticação e uso dos endpoints protegidos
+- Endpoint de login: POST `/api/auth/login` — envie JSON { "username": "<user>", "password": "<pass>" } e receba `{ "token": "<JWT>" }`.
+- Inclua o token no cabeçalho `Authorization: Bearer <token>` para acessar endpoints protegidos.
 
-Exemplo de login (curl):
-
-```bash
-curl -X POST "https://localhost:5001/api/auth/login" -H "Content-Type: application/json" -d '{"username":"admin","password":"password123"}'
-```
-
-Use o token retornado no header `Authorization: Bearer <token>` para acessar os endpoints protegidos.
-
-## Como rodar o frontend (desenvolvimento)
-
-Abra outro terminal e execute:
+Rodando o frontend (desenvolvimento)
 
 ```powershell
 Push-Location .\src\Frontend\cadastro-ui
@@ -67,11 +75,11 @@ npm run dev
 Pop-Location
 ```
 
-O Vite normalmente expõe a app em `http://localhost:5173`.
+O Vite geralmente expõe a aplicação em `http://localhost:5173`. Configure a URL da API no frontend conforme necessário (arquivo de ambiente ou variável de build).
 
-## Testes (xUnit)
+Testes (xUnit)
 
-Para executar os testes de integração/uniários:
+Para executar os testes do backend:
 
 ```powershell
 Push-Location .\src\Backend\CadastroPessoasApi.Tests
@@ -79,37 +87,45 @@ dotnet test
 Pop-Location
 ```
 
-Os testes usam uma instância in-memory de SQLite e um handler de autenticação de teste para evitar dependências externas.
+Os testes de integração usam uma instância SQLite em memória e um handler de autenticação especial para evitar dependências externas durante a execução.
 
-## Limpar índice Git (remover bin/obj do repositório)
+Swagger / Documentação da API
 
-Se porventura artefatos de build foram adicionados ao repositório, há um script auxiliar que remove esses arquivos do índice (`git rm --cached`) sem deletá-los do disco e commita a mudança.
+Ao rodar a API em ambiente de desenvolvimento, acesse `/swagger` para a documentação interativa. A configuração já inclui um esquema de segurança Bearer (JWT) para testar endpoints protegidos.
 
-Executar (no root do repositório):
+API versioning (nota)
 
-```powershell
-.\scripts\clean-git-index.ps1
-```
+O próximo passo planejado é disponibilizar versionamento de API (v1 e v2), onde v2 adicionará o campo `Endereco` como obrigatório. Atualmente a API expõe os endpoints principais em `/api/pessoas`.
 
-Verifique o `git status` após rodar o script e faça o push.
+Docker (opção rápida para produção)
 
-## Scripts úteis
-- `scripts/run-backend.ps1` — restaura, aplica migrações (opcional) e roda o backend.
-- `scripts/run-frontend.ps1` — instala dependências e roda o frontend Vite.
-- `scripts/clean-git-index.ps1` — remove `bin/obj/.vs` do índice e commita a alteração.
+É recomendado criar um `Dockerfile` para o backend e usar um serviço de hosting (ex.: Azure App Service, AWS ECS, DigitalOcean) para publicar a API. Um Dockerfile mínimo inclui:
 
-## Endpoints principais
-- POST `/api/auth/login` — recebe `{ username, password }`, retorna `{ token }`.
-- GET `/api/pessoas` — lista pessoas (protegido por JWT).
-- POST `/api/pessoas` — cria pessoa (valida CPF).
-- PUT `/api/pessoas/{id}` — atualiza pessoa.
-- DELETE `/api/pessoas/{id}` — remove pessoa.
+- build com SDK
+- publicação do app
+- execução com `dotnet <Assembly>.dll`
 
-## Boas práticas e observações para avaliação
-- Não inclua secrets no repositório; use variáveis de ambiente em produção.
-- Habilite o XML docs se quiser melhorar o Swagger (`<GenerateDocumentationFile>true</GenerateDocumentationFile>` no csproj) e adicione comentários aos controllers.
-- Para um deploy rápido: criar Dockerfile para o backend e usar Vercel/Netlify para o frontend.
+Sugestão de CI/CD
 
----
+- GitHub Actions ou Azure Pipelines para:
+	- Build do backend
+	- Execução dos testes (dotnet test)
+	- Build e deploy do frontend (Vite)
+	- Publicação do container (se usar Docker)
 
-Se quiser, eu crio também um `Dockerfile` para o backend e um workflow GitHub Actions que roda build + testes e publica o frontend automaticamente.
+Boas práticas e dicas rápidas
+- Não deixe segredos no repositório. Use o sistema de segredos da plataforma (GitHub Secrets, Azure Key Vault etc.).
+- Configure variáveis de ambiente para connection strings e chaves JWT.
+- Aumente a cobertura de testes adicionando testes unitários para o validador de CPF, para os DTOs e para os caminhos de falha dos controllers.
+
+Problemas comuns e soluções
+- Erro de porta / certificado ao rodar localmente: verifique o output do `dotnet run` para a porta e confie no certificado de desenvolvedor do ASP.NET Core (dotnet dev-certs https --trust).
+- Arquivos `bin/` e `obj/` foram acidentalmente comitados: atualize o `.gitignore` e remova do índice com `git rm --cached -r -- src/**/bin src/**/obj`.
+
+Contato / próximos passos
+- Se quiser, eu implemento:
+	- Versionamento da API (v1/v2) com DTOs separados e documentação Swagger por versão.
+	- Frontend CRUD completo com autenticação via JWT.
+	- Dockerfile e workflow GitHub Actions para build/test/deploy.
+
+Obrigado — se preferir, posso ajustar este README para incluir exemplos de requests (cURL) específicos ou um Dockerfile de exemplo.
