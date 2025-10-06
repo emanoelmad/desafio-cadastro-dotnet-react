@@ -38,6 +38,61 @@ public class PessoasController : ControllerBase
         return CreatedAtAction(nameof(GetPessoa), new { id = pessoa.Id }, pessoa);
     }
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutPessoa(int id, Pessoa pessoa)
+    {
+        if (id != pessoa.Id)
+        {
+            return BadRequest(new { message = "O ID da URL não corresponde ao ID do objeto enviado." });
+        }
+
+        pessoa.DataAtualizacao = DateTime.UtcNow;
+
+        bool cpfDuplicado = await _context.Pessoas
+            .AnyAsync(p => p.CPF == pessoa.CPF && p.Id != id);
+
+        if (cpfDuplicado)
+        {
+            return BadRequest(new { message = "O CPF informado já está cadastrado para outro usuário." });
+        }
+
+        _context.Entry(pessoa).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!_context.Pessoas.Any(e => e.Id == id))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeletePessoa(int id)
+    {
+        var pessoa = await _context.Pessoas.FindAsync(id);
+
+        if (pessoa == null)
+        {
+            return NotFound();
+        }
+
+        _context.Pessoas.Remove(pessoa);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
     [HttpGet("{id}")]
     [ApiExplorerSettings(IgnoreApi = true)]
     public async Task<ActionResult<Pessoa>> GetPessoa(int id)
