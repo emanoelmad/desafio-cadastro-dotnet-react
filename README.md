@@ -66,7 +66,31 @@ Autenticação e uso dos endpoints protegidos
 - Endpoint de login: POST `/api/auth/login` — envie JSON { "username": "<user>", "password": "<pass>" } e receba `{ "token": "<JWT>" }`.
 - Inclua o token no cabeçalho `Authorization: Bearer <token>` para acessar endpoints protegidos.
 
-Rodando o frontend (desenvolvimento)
+Desafio Cadastro (.NET + React)
+
+Resumo curto e direto do que existe neste repositório:
+
+- Backend: `src/Backend/CadastroPessoasApi/` — API ASP.NET Core com EF Core (SQLite).
+- Testes: `src/Backend/CadastroPessoasApi.Tests/` — testes xUnit de integração.
+- Frontend: `src/Frontend/cadastro-ui/` — app React + Vite (esqueleto).
+
+O backend implementa endpoints básicos para gerenciamento de pessoas (CRUD). Há validação de CPF, email e campos obrigatórios. A API expõe documentação Swagger em ambiente de desenvolvimento.
+
+Como executar (essencial)
+
+1) Backend (PowerShell):
+
+```powershell
+Push-Location .\src\Backend\CadastroPessoasApi
+dotnet restore
+dotnet build
+dotnet run
+Pop-Location
+```
+
+Após `dotnet run`, acesse `https://localhost:<porta>/swagger` para a documentação.
+
+2) Frontend (PowerShell):
 
 ```powershell
 Push-Location .\src\Frontend\cadastro-ui
@@ -75,11 +99,7 @@ npm run dev
 Pop-Location
 ```
 
-O Vite geralmente expõe a aplicação em `http://localhost:5173`. Configure a URL da API no frontend conforme necessário (arquivo de ambiente ou variável de build).
-
-Testes (xUnit)
-
-Para executar os testes do backend:
+3) Testes (PowerShell):
 
 ```powershell
 Push-Location .\src\Backend\CadastroPessoasApi.Tests
@@ -87,45 +107,10 @@ dotnet test
 Pop-Location
 ```
 
-Os testes de integração usam uma instância SQLite em memória e um handler de autenticação especial para evitar dependências externas durante a execução.
+Observações técnicas mínimas
 
-Swagger / Documentação da API
+- A autenticação do backend usa JWT. Há um endpoint de login que emite token.
+- O banco padrão para desenvolvimento é SQLite (arquivo local); os testes usam SQLite in-memory.
+- Arquivos de build (`bin/` e `obj/`) devem ser ignorados pelo .gitignore.
 
-Ao rodar a API em ambiente de desenvolvimento, acesse `/swagger` para a documentação interativa. A configuração já inclui um esquema de segurança Bearer (JWT) para testar endpoints protegidos.
-
-API versioning (nota)
-
-O próximo passo planejado é disponibilizar versionamento de API (v1 e v2), onde v2 adicionará o campo `Endereco` como obrigatório. Atualmente a API expõe os endpoints principais em `/api/pessoas`.
-
-Docker (opção rápida para produção)
-
-É recomendado criar um `Dockerfile` para o backend e usar um serviço de hosting (ex.: Azure App Service, AWS ECS, DigitalOcean) para publicar a API. Um Dockerfile mínimo inclui:
-
-- build com SDK
-- publicação do app
-- execução com `dotnet <Assembly>.dll`
-
-Sugestão de CI/CD
-
-- GitHub Actions ou Azure Pipelines para:
-	- Build do backend
-	- Execução dos testes (dotnet test)
-	- Build e deploy do frontend (Vite)
-	- Publicação do container (se usar Docker)
-
-Boas práticas e dicas rápidas
-- Não deixe segredos no repositório. Use o sistema de segredos da plataforma (GitHub Secrets, Azure Key Vault etc.).
-- Configure variáveis de ambiente para connection strings e chaves JWT.
-- Aumente a cobertura de testes adicionando testes unitários para o validador de CPF, para os DTOs e para os caminhos de falha dos controllers.
-
-Problemas comuns e soluções
-- Erro de porta / certificado ao rodar localmente: verifique o output do `dotnet run` para a porta e confie no certificado de desenvolvedor do ASP.NET Core (dotnet dev-certs https --trust).
-- Arquivos `bin/` e `obj/` foram acidentalmente comitados: atualize o `.gitignore` e remova do índice com `git rm --cached -r -- src/**/bin src/**/obj`.
-
-Contato / próximos passos
-- Se quiser, eu implemento:
-	- Versionamento da API (v1/v2) com DTOs separados e documentação Swagger por versão.
-	- Frontend CRUD completo com autenticação via JWT.
-	- Dockerfile e workflow GitHub Actions para build/test/deploy.
-
-Obrigado — se preferir, posso ajustar este README para incluir exemplos de requests (cURL) específicos ou um Dockerfile de exemplo.
+Se precisar, eu faço apenas a alteração do README para remover ou ajustar linhas específicas sem outras mudanças.
