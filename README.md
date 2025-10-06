@@ -106,11 +106,3 @@ Push-Location .\src\Backend\CadastroPessoasApi.Tests
 dotnet test
 Pop-Location
 ```
-
-Observações técnicas mínimas
-
-- A autenticação do backend usa JWT. Há um endpoint de login que emite token.
-- O banco padrão para desenvolvimento é SQLite (arquivo local); os testes usam SQLite in-memory.
-- Arquivos de build (`bin/` e `obj/`) devem ser ignorados pelo .gitignore.
-
-Se precisar, eu faço apenas a alteração do README para remover ou ajustar linhas específicas sem outras mudanças.
