@@ -14,15 +14,13 @@ namespace CadastroPessoasApi.Models
 
         [Required]
         public DateTime DataNascimento { get; set; }
-
         public string? Sexo { get; set; }
         public string? Email { get; set; }
         public string? Naturalidade { get; set; }
         public string? Nacionalidade { get; set; }
 
     // Endereço foi introduzido para suportar a API v2
-    public string? Endereco { get; set; }
-
+        public string? Endereco { get; set; }
         public DateTime DataCadastro { get; set; }
         public DateTime DataAtualizacao { get; set; }
     }
