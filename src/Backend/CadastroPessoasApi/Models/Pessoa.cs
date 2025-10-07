@@ -20,6 +20,9 @@ namespace CadastroPessoasApi.Models
         public string? Naturalidade { get; set; }
         public string? Nacionalidade { get; set; }
 
+    // Endereço foi introduzido para suportar a API v2
+    public string? Endereco { get; set; }
+
         public DateTime DataCadastro { get; set; }
         public DateTime DataAtualizacao { get; set; }
     }
