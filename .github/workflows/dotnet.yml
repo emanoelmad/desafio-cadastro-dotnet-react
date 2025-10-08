@@ -23,7 +23,7 @@ jobs:
         run: dotnet build --no-restore --configuration Release "src/Backend/CadastroPessoasApi/CadastroPessoasApi.sln"
 
       - name: Test with coverage
-        run: dotnet test "src/Backend/CadastroPessoasApi.Tests/CadastroPessoasApi.Tests.csproj" --configuration Release --no-build --collect:"XPlat Code Coverage"
+        run: dotnet test "src/Backend/CadastroPessoasApi.Tests/CadastroPessoasApi.Tests.csproj" --configuration Release --collect:"XPlat Code Coverage"
 
       - name: Install reportgenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.1.22
