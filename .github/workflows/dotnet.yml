@@ -1,0 +1,41 @@
+name: .NET CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore "src/Backend/CadastroPessoasApi.sln"
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release "src/Backend/CadastroPessoasApi.sln"
+
+      - name: Test with coverage
+        run: |
+          dotnet test "src/Backend/CadastroPessoasApi.Tests/CadastroPessoasApi.Tests.csproj" --configuration Release --no-build --collect:"XPlat Code Coverage"
+
+      - name: Install reportgenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.1.22
+
+      - name: Generate coverage report
+        run: |
+          reportgenerator -reports:"**/TestResults/**/coverage.cobertura.xml" -targetdir:coverage-report -reporttypes:Html
+          reportgenerator -reports:"**/TestResults/**/coverage.cobertura.xml" -targetdir:coverage-report -reporttypes:TextSummary
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report
