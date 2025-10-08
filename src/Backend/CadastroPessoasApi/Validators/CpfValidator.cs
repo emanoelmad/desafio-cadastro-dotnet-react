@@ -12,7 +12,7 @@ namespace CadastroPessoasApi.Validators
 
             if (digits.Length != 11) return false;
 
-            // invalid sequences
+            
             var invalids = new[]
             {
                 "00000000000","11111111111","22222222222","33333333333","44444444444",
@@ -20,7 +20,7 @@ namespace CadastroPessoasApi.Validators
             };
             if (invalids.Contains(digits)) return false;
 
-            // calculate first digit
+            
             int[] numbers = digits.Select(c => c - '0').ToArray();
 
             int sum = 0;
@@ -29,7 +29,7 @@ namespace CadastroPessoasApi.Validators
             int firstDigit = (result < 2) ? 0 : 11 - result;
             if (numbers[9] != firstDigit) return false;
 
-            // calculate second digit
+            
             sum = 0;
             for (int i = 0; i < 10; i++) sum += numbers[i] * (11 - i);
             result = sum % 11;

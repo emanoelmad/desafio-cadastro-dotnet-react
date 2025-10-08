@@ -12,7 +12,7 @@ namespace CadastroPessoasApi.Controllers
     {
         private readonly IConfiguration _configuration;
 
-        // Very small in-memory user store for demo; replace with real user store in production
+        
         private static readonly List<(string Username, string Password)> _users = new()
         {
             ("admin", "password123"),
