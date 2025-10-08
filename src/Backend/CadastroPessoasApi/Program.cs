@@ -81,7 +81,17 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+try
+{
+    app.Run();
+}
+catch (Exception ex)
+{
+    Console.Error.WriteLine("Exceção não tratada no host: " + ex);
+
+    Environment.ExitCode = 1;
+    throw;
+}
 
 // Expose Program class for integration tests
 public partial class Program { }

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace CadastroPessoasApi.Controllers.v2
 {
     [ApiController]
-    [Route("api/v2/[controller]")]
+    [Route("api/v2/pessoas")]
     [Authorize]
     public class PessoasV2Controller : ControllerBase
     {
