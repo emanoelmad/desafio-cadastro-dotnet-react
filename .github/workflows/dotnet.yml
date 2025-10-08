@@ -17,10 +17,10 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore
-        run: dotnet restore "src/Backend/CadastroPessoasApi.sln"
+        run: dotnet restore "src/Backend/CadastroPessoasApi/CadastroPessoasApi.sln"
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release "src/Backend/CadastroPessoasApi.sln"
+        run: dotnet build --no-restore --configuration Release "src/Backend/CadastroPessoasApi/CadastroPessoasApi.sln"
 
       - name: Test with coverage
         run: |
